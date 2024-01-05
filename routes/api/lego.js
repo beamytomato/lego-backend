@@ -10,7 +10,7 @@ const axios = require("axios");
 const lego = require('../../model/lego');
 const CryptoJS = require('crypto-js')
 const jwt = require('jsonwebtoken')
-const {handleError, encryptData, verifyToken} = require('../../utils/authUtils')
+const {handleError, encryptData, verifyToken, sortAllLegosByRating} = require('../../utils/authUtils')
 
 
 const SECRET_KEY = process.env.SERVER_SECRET_KEY
@@ -75,8 +75,6 @@ router.get('/fetch/user/by/email/:email', async (req, res) => {
     
         const user = await User.findOne({email : email});
 
-        console.log(JSON.stringify(user))
-    
         if(user){
             const userData = user.toJSON();
             console.log("this is user data: ", JSON.stringify(userData))
@@ -88,10 +86,10 @@ router.get('/fetch/user/by/email/:email', async (req, res) => {
             req.user = userData;
             const userObjStr = JSON.stringify(user);
             const encryptedUser = encryptData(userObjStr)
-            return res.status(200).send(encryptedUser);
+            return res.status(200).json(encryptedUser);
         }
         else{
-            return res.status(404).send({message: 'the user does not exist'});
+            return res.status(404).json({message: 'the user does not exist'});
         }
     } catch (error) {
         console.log(error);
@@ -175,7 +173,9 @@ router.get('/fetch/lego/:legoID', async (req,res) => {
 })
 
 router.get('/fetch/legos/all', async (req, res) => {
-    const legos = await Lego.find();
+    const legos = await Lego.find().sort({rating: -1})
+    // const sortedLegos = sortAllLegosByRating(legos);
+    // console.log(sortedLegos)
     return res.status(200).send(legos);
 })
 
@@ -188,6 +188,23 @@ router.get('/legos/filter/by/price/:category/:price', async (req, res) => {
     const query = {$and: [{price: {$lte:price}}, {category: {$eq: category}}]};
     const legos = await Lego.find(query);
     return res.status(200).send(legos);
+})
+
+router.get('/legos/filter/by/category/:category', async (req, res) => {
+    try{
+        const category = req.params.category;
+        const legos = await Lego.find({category: category})
+        if(legos){
+            return res.status(200).send(legos);
+        }
+        else{
+            return res.status(404).send({});
+        }
+    }
+    catch(error){
+        console.log(error);
+        return res.status(400).send({});
+    }
 })
 
 router.get('/lego/categories', verifyToken, async (req, res) => {

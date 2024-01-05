@@ -30,6 +30,22 @@ const encryptData = (data) => {
     }
 }
 
+const sortAllLegosByRating = (legoList) => {
+    // define code here
+    for(var i = 0; i < legoList.length; i++){
+        var maxIndex = i;
+        for(var j = i + 1; j < legoList.length; j++){
+            if(legoList[j].rating > legoList[maxIndex].rating){
+                maxIndex = j;
+            }
+        }
+        temp = legoList[i];
+        legoList[i] = legoList[maxIndex];
+        legoList[maxIndex] = temp;
+    }
+    return legoList;
+}
+
 const verifyToken = async (req, res, next) => {
     const accessToken = req.cookies.accessToken
     if (!accessToken) {
@@ -65,4 +81,4 @@ const verifyToken = async (req, res, next) => {
 }
 
 
-module.exports = {handleError, encryptData, verifyToken};
+module.exports = {handleError, encryptData, verifyToken, sortAllLegosByRating};
