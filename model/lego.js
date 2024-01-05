@@ -10,7 +10,9 @@ const legoSchema = new mongoose.Schema({
     imageURL: String,
     model: String,
     user_seller_id : String,
-    category : String
+    category : String,
+    is_expired : Boolean,
+    time_stamp : String
 })
 
 module.exports = mongoose.model("lego", legoSchema);

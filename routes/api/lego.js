@@ -179,6 +179,15 @@ router.get('/fetch/legos/all', async (req, res) => {
     return res.status(200).send(legos);
 })
 
+router.get('/fetch/expired/legos', async (req, res) => {
+    const legos = await Lego.find({is_expired : true});
+    // for(var i = 0; i < legos.length; i++){
+    //     var lego = legos[i];
+    //     var timestamp = req.params.lego.
+    // }
+    return res.status(200).send(legos);
+})
+
 router.get('/legos/filter/by/price/:category/:price', async (req, res) => {
     const category = req.params.category;
     const price = parseInt(req.params.price);
